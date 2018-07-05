@@ -4,15 +4,17 @@ function printReceipt(tags){
     //calculateSameItems(tags);
    let sameItems =countSameItems(tags);
     //console.log(sameItems[0].barcode);
-
+    //console.info(sameItems);
     let detailItems=itemDetail(sameItems);
-    //console.log(detailItems)
+    console.info(detailItems);
 
     let detailItemsForDis= discount(detailItems);
-    //console.log(detailItemsForDis);
+    console.info(detailItemsForDis);
     
     console.log(print(detailItemsForDis));
 };
+
+
 
 function countSameItems(collection) {
     // key-value
@@ -78,24 +80,45 @@ function itemDetail(sameItems){
     return detailItems;
 }
 
-function discount(detailItems){
+// function discount(detailItems){
+//     let discountItem=loadPromotions();
+//     let discount=0;
+//     for(let i=0;i< discountItem[0].barcodes.length;i++){
+//         for(let j=0; j<detailItems.length;j++){
+//             if(discountItem[0].barcodes[i]===detailItems[j].barcode){
+//                 if(detailItems[j].num>=2){
+//                     detailItems[j].subtotal=detailItems[j].subtotal-detailItems[j].price;
+//                     //detailItems[j].subtotal=detailItems[j].subtotal-(parseInt(detailItems[j].num/3)*2+detailItems[j].num%2);
+//                     discount+=detailItems[j].price;
+//                 }
+//             }
+//         }
+        
+//     }
+//     detailItems.push({discou:discount});         //浅拷贝做法，导致原数组被改变
+//     return detailItems;
+// }
+
+function discount(detailItems){     //  深拷贝做法，达到效果
     let discountItem=loadPromotions();
     let discount=0;
+    let detailItemsClone=detailItems.slice(0);
+    //console.info(detailItemsClone);
     for(let i=0;i< discountItem[0].barcodes.length;i++){
-        for(let j=0; j<detailItems.length;j++){
-            if(discountItem[0].barcodes[i]===detailItems[j].barcode){
-                if(detailItems[j].num>=2){
-                    detailItems[j].subtotal=detailItems[j].subtotal-detailItems[j].price;
-                    discount+=detailItems[j].price;
+        for(let j=0; j<detailItemsClone.length;j++){
+            if(discountItem[0].barcodes[i]===detailItemsClone[j].barcode){
+                if(detailItemsClone[j].num>=2){
+                    detailItemsClone[j].subtotal=detailItemsClone[j].subtotal-detailItemsClone[j].price;
+                    //detailItems[j].subtotal=detailItems[j].subtotal-(parseInt(detailItems[j].num/3)*2+detailItems[j].num%2);
+                    discount+=detailItemsClone[j].price;
                 }
             }
         }
         
     }
-    detailItems.push({discou:discount});
-    return detailItems;
+    detailItemsClone.push({discou:discount});
+    return detailItemsClone;
 }
-
 function print(detailItemsForDis){
     let sum=0;          //数字要记得初始化
     let title="***<没钱赚商店>收据***\n";

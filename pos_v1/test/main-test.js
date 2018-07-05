@@ -30,3 +30,12 @@ describe('pos', () => {
     expect(console.log).toHaveBeenCalledWith(expectText);
   });
 });
+
+// describe('forTest', () => {
+//   it('should return  5', () => {
+//     //countSameItems(tags);
+//     const num=forTest();
+//     const expectNum = 5;
+//     expect(num).toBe(expectNum);
+//   });
+// });
