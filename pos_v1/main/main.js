@@ -2,21 +2,21 @@
 
 function printReceipt(tags){
     //calculateSameItems(tags);
-   let sameItems =countSameItems(tags);
+   let cartItems =buildcartItems(tags);
     //console.log(sameItems[0].barcode);
     //console.info(sameItems);
-    let detailItems=itemDetail(sameItems);
-    console.info(detailItems);
+    let detailItems=builditemDetail(cartItems);
+    //console.info(detailItems);
 
     let detailItemsForDis= discount(detailItems);
     console.info(detailItemsForDis);
     
-    console.log(print(detailItemsForDis));
+    console.log(generateReceipt(detailItemsForDis));
 };
 
 
 
-function countSameItems(collection) {
+function buildcartItems(collection) {
     // key-value
     let map = new Map();
     // 遍历集合中所有字符串
@@ -52,7 +52,7 @@ function countSameItems(collection) {
   return sameItems;
 }
 
-function itemDetail(sameItems){
+function builditemDetail(sameItems){
     let detailItems=[];
     let wholeItems=loadAllItems();
     // for(let i of sameItems){
@@ -99,6 +99,26 @@ function itemDetail(sameItems){
 //     return detailItems;
 // }
 
+// function discount(detailItems){     //  深拷贝做法，达到效果
+//     let discountItem=loadPromotions();
+//     let discount=0;
+//     let detailItemsClone=detailItems.slice(0);
+//     //console.info(detailItemsClone);
+//     for(let i=0;i< discountItem[0].barcodes.length;i++){
+//         for(let j=0; j<detailItemsClone.length;j++){
+//             if(discountItem[0].barcodes[i]===detailItemsClone[j].barcode){
+//                 if(detailItemsClone[j].num>=2){
+//                     detailItemsClone[j].subtotal=detailItemsClone[j].subtotal-detailItemsClone[j].price;         //满二只减一
+//                     //detailItems[j].subtotal=detailItems[j].subtotal-(parseInt(detailItems[j].num/3)*2+detailItems[j].num%2);
+//                     discount+=detailItemsClone[j].price;
+//                 }
+//             }
+//         }
+        
+//     }
+//     detailItemsClone.push({discou:discount});
+//     return detailItemsClone;
+// }
 function discount(detailItems){     //  深拷贝做法，达到效果
     let discountItem=loadPromotions();
     let discount=0;
@@ -108,7 +128,7 @@ function discount(detailItems){     //  深拷贝做法，达到效果
         for(let j=0; j<detailItemsClone.length;j++){
             if(discountItem[0].barcodes[i]===detailItemsClone[j].barcode){
                 if(detailItemsClone[j].num>=2){
-                    detailItemsClone[j].subtotal=detailItemsClone[j].subtotal-detailItemsClone[j].price;
+                    detailItemsClone[j].subtotal=detailItemsClone[j].subtotal-detailItemsClone[j].price*(Math.floor(detailItemsClone[j].num/3));    //每满二减一
                     //detailItems[j].subtotal=detailItems[j].subtotal-(parseInt(detailItems[j].num/3)*2+detailItems[j].num%2);
                     discount+=detailItemsClone[j].price;
                 }
@@ -119,7 +139,8 @@ function discount(detailItems){     //  深拷贝做法，达到效果
     detailItemsClone.push({discou:discount});
     return detailItemsClone;
 }
-function print(detailItemsForDis){
+
+function generateReceipt(detailItemsForDis){
     let sum=0;          //数字要记得初始化
     let title="***<没钱赚商店>收据***\n";
     let content="";
