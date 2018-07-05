@@ -9,8 +9,9 @@ function printReceipt(tags){
     //console.info(detailItems);
 
     let receiptItems= buildreceiptItems(itemDetail);
-    console.info(receiptItems);
+    //console.info(receiptItems);
     
+    console.info(JSON.stringify(generateReceipt(receiptItems)));
     console.log(generateReceipt(receiptItems));
 };
 

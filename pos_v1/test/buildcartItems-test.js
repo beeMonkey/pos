@@ -1,4 +1,4 @@
-describe('buildcartItems', () => {
+describe('buildcartItems-test', () => {
     it('should return  Array', () => {
       const tags = [
         'ITEM000001',
