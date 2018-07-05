@@ -5,13 +5,13 @@ function printReceipt(tags){
    let cartItems =buildcartItems(tags);
     //console.log(sameItems[0].barcode);
     //console.info(sameItems);
-    let detailItems=builditemDetail(cartItems);
+    let itemDetail=builditemDetail(cartItems);
     //console.info(detailItems);
 
-    let detailItemsForDis= discount(detailItems);
-    console.info(detailItemsForDis);
+    let receiptItems= buildreceiptItems(itemDetail);
+    console.info(receiptItems);
     
-    console.log(generateReceipt(detailItemsForDis));
+    console.log(generateReceipt(receiptItems));
 };
 
 
@@ -72,7 +72,7 @@ function builditemDetail(sameItems){
                                     unit:wholeItems[j].unit,
                                     price:wholeItems[j].price,
                                     num:sameItems[i].amount,
-                                    subtotal:sameItems[i].amount*wholeItems[j].price})
+                                    subtotal:sameItems[i].amount*wholeItems[j].price});
                  }
         }
     }
@@ -119,7 +119,7 @@ function builditemDetail(sameItems){
 //     detailItemsClone.push({discou:discount});
 //     return detailItemsClone;
 // }
-function discount(detailItems){     //  深拷贝做法，达到效果
+function buildreceiptItems(detailItems){     //  深拷贝做法，达到效果
     let discountItem=loadPromotions();
     let discount=0;
     let detailItemsClone=detailItems.slice(0);
