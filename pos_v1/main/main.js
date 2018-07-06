@@ -10,10 +10,49 @@ function printReceipt(tags){
 
     let receiptItems= buildreceiptItems(itemDetail);
     //console.info(receiptItems);
-    
-    console.info(JSON.stringify(generateReceipt(receiptItems)));
+    calTotalAndSaved(receiptItems);
+    //console.info(JSON.stringify(generateReceipt(receiptItems)));
+    //let formattedBarcodes=buildformattedBarcodes(tags);
+    //setcartItems(formattedBarcodes);
     console.log(generateReceipt(receiptItems));
 };
+
+function buildformattedBarcodes(tags){
+    let formattedBarcodes=[];
+    for(let tag of tags){
+        let  barcodeObject={
+            barcode:tag,
+            count:1
+        }
+        if(tag.indexOf("-")!==-1){
+            let tempArray=tag.split("-");
+            barcodeObject={
+                barcode:tempArray[0],
+                count:parseFloat(tempArray[1])
+            }
+        }
+        formattedBarcodes.push(barcodeObject);
+    }
+    return formattedBarcodes;
+}
+function setcartItems(formattedBarcodes){
+    console.info(formattedBarcodes);
+    let cartItems = [];
+    for(let formattedBarcode of formattedBarcodes){
+        let existCartItem =null;
+        for(let cartItem of cartItems){
+            if(cartItem.barcode===formattedBarcode.barcode)
+            existCartItem = cartItem; 
+        }
+        if(existCartItem!=null){
+            existCartItem.count+=formattedBarcode.count;
+        }else{
+            cartItems.push({...formattedBarcode});
+        }
+        console.info(cartItems);
+    }
+}
+
 
 
 
@@ -22,7 +61,7 @@ function buildcartItems(collection) {
     let map = new Map();
     // 遍历集合中所有字符串
     for(let i=0;i<collection.length;i++){
-      // 判断字符串长度， 如果等于1，直接做统计，否则做特殊处理统计
+      // 判断字符串长度， 如果等于10，直接做统计，否则做特殊处理统计
       if(collection[i].length == 10) {
         let ele = collection[i];
         // 判断是否已有存在的key
@@ -121,39 +160,58 @@ function builditemDetail(sameItems){
 //     return detailItemsClone;
 // }
 function buildreceiptItems(detailItems){     //  深拷贝做法，达到效果
-    let discountItem=loadPromotions();
-    let discount=0;
+    let promotions=loadPromotions();
+    //let saved=0;
+    let receipt={};
     let detailItemsClone=detailItems.slice(0);
     //console.info(detailItemsClone);
-    for(let i=0;i< discountItem[0].barcodes.length;i++){
+    for(let i=0;i< promotions[0].barcodes.length;i++){
         for(let j=0; j<detailItemsClone.length;j++){
-            if(discountItem[0].barcodes[i]===detailItemsClone[j].barcode){
-                if(detailItemsClone[j].num>=2){
+            if(promotions[0].barcodes[i]===detailItems[j].barcode){
+                //if(detailItemsClone[j].num>=2){
                     detailItemsClone[j].subtotal=detailItemsClone[j].subtotal-detailItemsClone[j].price*(Math.floor(detailItemsClone[j].num/3));    //每满二减一
                     //detailItems[j].subtotal=detailItems[j].subtotal-(parseInt(detailItems[j].num/3)*2+detailItems[j].num%2);
-                    discount+=detailItemsClone[j].price;
-                }
+                    //saved+=detailItemsClone[j].price*(Math.floor(detailItemsClone[j].num/3));
+                //}
             }
         }
         
     }
-    detailItemsClone.push({discou:discount});
-    return detailItemsClone;
+    receipt.items=detailItemsClone;
+    //receipt.saved=saved;
+    //detailItemsClone.push({saved:saved});
+    return receipt;
 }
-
-function generateReceipt(detailItemsForDis){
-    let sum=0;          //数字要记得初始化
-    let title="***<没钱赚商店>收据***\n";
-    let content="";
-    for(let i=0;i<detailItemsForDis.length-1;i++){
-        sum=sum+detailItemsForDis[i].subtotal;
-        let price=detailItemsForDis[i].price.toFixed(2);
-
-        content+="名称："+detailItemsForDis[i].name+'，'+'数量：'+detailItemsForDis[i].num+detailItemsForDis[i].unit+'，' +
-                 '单价：'+price+'(元)，'+'小计：'+detailItemsForDis[i].subtotal.toFixed(2)+'(元)\n';
+function calTotalAndSaved(receipt){
+    let total=0;
+    let saved=0;
+    for(let item of receipt.items){
+        total+=item.subtotal;
+        saved+=item.price*item.num-item.subtotal;
     }
+    receipt.total=total;
+    receipt.saved=saved;
 
-    let total='----------------------\n总计：'+sum.toFixed(2)+'(元)'+'\n';
-    let subtotal='节省：'+detailItemsForDis[3].discou.toFixed(2)+'(元)'+'\n**********************';
-    return title+content+total+subtotal;
+    return receipt;
+}
+function generateReceipt(receipt){
+    //let sum=0;          //数字要记得初始化
+    let title="***<没钱赚商店>收据***\n";
+    let content=title;
+    for(let item of receipt.items){
+        let price=item.price.toFixed(2);
+        //sum=sum+item.subtotal;
+        content+="名称："+item.name+'，'+'数量：'+item.num+item.unit+'，' +
+                 '单价：'+price+'(元)，'+'小计：'+item.subtotal.toFixed(2)+'(元)\n';
+    }
+    // for(let i=0;i<receipt.item.length-1;i++){
+    //     let price=receipt[i].price.toFixed(2);
+
+    //     content+="名称："+receipt[i].name+'，'+'数量：'+receipt[i].num+receipt[i].unit+'，' +
+    //              '单价：'+price+'(元)，'+'小计：'+receipt[i].subtotal.toFixed(2)+'(元)\n';
+    // }
+
+    content+='----------------------\n总计：'+receipt.total.toFixed(2)+'(元)'+'\n';
+    content+='节省：'+receipt.saved.toFixed(2)+'(元)'+'\n**********************';
+    return content;
 }
