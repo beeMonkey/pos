@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "test": "node run-tests.js"
+    "test": "node run-tests.js",
+    "test-single": "jasmine-node --verbose $file"
   },
   "repository": {
     "type": "git",

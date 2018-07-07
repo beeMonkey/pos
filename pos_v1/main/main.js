@@ -5,7 +5,7 @@ const { loadAllItems, loadPromotions } = require('../spec/fixtures')
 
 function printReceipt(tags) {
     let tagWithCounts = buildtagWithCounts(tags);
-    let cartItems = buildicartItems(tagWithCounts);
+    let cartItems = buildcartItems(tagWithCounts);
     let receiptItems = buildreceiptItems(cartItems);
     calTotalAndSaved(receiptItems);
     console.log(generateReceipt(receiptItems));
@@ -13,7 +13,7 @@ function printReceipt(tags) {
 function buildformattedBarcodes(tags) {
     return tags.map((tag) => {
         if (tag.indexOf("-") !== -1) {
-            let [barcode, amount ] = tag.split("-");
+            let [barcode, amount ] = tag.split("-");    //数组解构赋值，将数组中的值分割给变量
             return {
                 barcode: barcode,
                 amount: parseFloat(amount)
@@ -25,43 +25,7 @@ function buildformattedBarcodes(tags) {
         }
     });
 }
-function buildformattedBarcodes(tags) {
-    let formattedBarcodes = [];
-    for (let tag of tags) {
-        let barcodeObject = {
-            barcode: tag,
-            amount: 1
-        }
-        if (tag.indexOf("-") !== -1) {
-            let tempArray = tag.split("-");
-            barcodeObject = {
-                barcode: tempArray[0],
-                amount: parseFloat(tempArray[1])
-            }
-        }
-        formattedBarcodes.push(barcodeObject);
-    }
-    return formattedBarcodes;
-}
-// function calTagCount(formattedBarcodes) {
-//     let arr = [];
-//     for (var i = 0; i < formattedBarcodes.length;) {
-//         var count = 0;
-//         for (var j = i; j < formattedBarcodes.length; j++) {
-//             if (formattedBarcodes[i] === formattedBarcodes[j]) {
-//                 formattedBarcodes[i].amount = formattedBarcodes[i].amount + formattedBarcodes[j].amount;
-//             }
-//         }
 
-//         arr.push({
-//             barcode: formattedBarcodes[i],
-//             amount: formattedBarcodes[i].amount 
-//         })
-//         i += count;
-//     }
-//     console.info(arr)
-//     return arr;
-// }
 function calTagCount(formattedBarcodes) {
     let cartItems = [];
     for (let formattedBarcode of formattedBarcodes) {
@@ -86,64 +50,19 @@ function buildtagWithCounts(tags) {
     return tagWithCounts;
 }
 
-
-// function buildtagWithCounts(tags) {
-//     // key-value
-//     let map = new Map();
-//     // 遍历集合中所有字符串
-//     for (let tag of tags) {
-//         // 判断字符串长度， 如果等于10，直接做统计，否则做特殊处理统计
-//         if (tag.length == 10) {
-//             let ele = tag;
-//             // 判断是否已有存在的key
-//             if (!map.has(ele)) {
-//                 map.set(ele, 0);
-//             }
-//             // 取出value加一
-//             map.set(ele, map.get(ele) + 1);
-//         } else {
-//             // 取字符串第一个字符作为key
-//             let ele = tag.substring(0, 10);
-//             if (!map.has(ele)) {
-//                 map.set(ele, 0);
-//             }
-//             // 取字符串中的数字并做类型转换
-//             let nums = parseFloat(tag.substring(11));
-//             map.set(ele, map.get(ele) + nums);
-//         }
-//     }
-//     let tagWithCounts = [];
-//     map.forEach(function (value, key) {
-//         tagWithCounts.push({
-//             barcode: key,
-//             amount: value
-//         });
-//     })
-//     return tagWithCounts;
-// }
-
-
-
-function buildicartItems(tagWithCounts) {
-    let detailItems = [];
+function buildcartItems(tagWithCounts) {
     let allItems = fixtures.loadAllItems();
-    for (let tagWithCount of tagWithCounts) {
-        for (let itemOfAll of allItems) {
-            if (tagWithCount.barcode === itemOfAll.barcode) {
-                detailItems.push({
-                    barcode: tagWithCount.barcode,
-                    name: itemOfAll.name,
-                    unit: itemOfAll.unit,
-                    price: itemOfAll.price,
-                    num: tagWithCount.amount,
-                    subtotal: tagWithCount.amount * itemOfAll.price
-                });
-            }
-        }
-    }
-    return detailItems;
+    return tagWithCounts.map((tagWithCount)=>{
+        const itemByFind=allItems.find(function(item){
+            return tagWithCount.barcode === item.barcode;
+        })
+    const{name,unit,price}=itemByFind;
+    const{barcode,amount}=tagWithCount;
+    const subtotal=price*amount;
+    //console.info({barcode,name,unit,price,amount})
+    return {barcode,name,unit,price,num:amount,subtotal};
+})  
 }
-
 function buildreceiptItems(cartItems) {     //  深拷贝做法，达到效果
     let promotions = loadPromotions()[0].barcodes;
     let receipt = {};
@@ -183,7 +102,7 @@ function generateReceipt(receipt) {
 
 module.exports = {
     buildtagWithCounts,
-    buildicartItems,
+    buildcartItems,
     buildreceiptItems,
     calTotalAndSaved,
     printReceipt

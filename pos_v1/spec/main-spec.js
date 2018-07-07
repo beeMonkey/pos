@@ -1,7 +1,7 @@
 'use stricst'
 
 const main = require('../main/main')
-const { buildtagWithCounts, buildicartItems, buildreceiptItems, calTotalAndSaved, printReceipt } = require('../main/main')
+const { buildtagWithCounts, buildcartItems, buildreceiptItems, calTotalAndSaved, printReceipt } = require('../main/main')
 describe('main().buildtagWithCounts(tags)-test', () => {
     it('should return  Array', () => {
         const tags = [
@@ -39,7 +39,7 @@ describe('main().buildcartItems()-test', () => {
         ];
         const tagWithCounts = main.buildtagWithCounts(tags);
 
-        const cartItems = JSON.stringify(main.buildicartItems(tagWithCounts));
+        const cartItems = JSON.stringify(main.buildcartItems(tagWithCounts));
         //const detailItems=5;
         const expectArray = JSON.stringify([
             {
@@ -67,7 +67,7 @@ describe('main().buildreceiptItems-test', () => {
             'ITEM000005-2',
         ];
         const tagWithCounts = buildtagWithCounts(tags);
-        const cartItems = buildicartItems(tagWithCounts);
+        const cartItems = buildcartItems(tagWithCounts);
 
         const receipItems = JSON.stringify(buildreceiptItems(cartItems));
 
@@ -89,7 +89,7 @@ describe('main().calTotalAndSaved-test', () => {
             'ITEM000005-2',
         ];
         const tagWithCounts = buildtagWithCounts(tags);
-        const cartItems = buildicartItems(tagWithCounts);
+        const cartItems = buildcartItems(tagWithCounts);
 
         const receipItems = buildreceiptItems(cartItems);
 
